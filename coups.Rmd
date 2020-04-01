@@ -55,9 +55,25 @@ coup_data <- join_copo %>%
 
 ```{r plot}
 
-ggplot(coup_data, aes(x = polity, y = number, color = type_of_coup)) + 
+simple_graph <- ggplot(coup_data, 
+                       aes(x = polity, y = number, color = type_of_coup)) + 
   geom_jitter(width = 0.5, height = 0.5) +
+  labs(
+    title = "Number of Coups d'Etat by Regime Type",
+    subtitle = "Including attempts and conspiracies",
+    x = "Polity IV scale (-10 is least democratic, +10 is most democratic)",
+    y = "Number of Coups d'Etat",
+    color = "Type of Coup",
+    caption = "Data from the Polity IV Project and the Coup d'Etat Project") +
   theme_classic()
+
+```
+
+```{r graph_fun}
+
+simple_graph +
+  transition_manual(type_of_coup)
+
 ```
 
 
