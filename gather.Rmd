@@ -5,7 +5,6 @@ date: "4/1/2020"
 output: html_document
 ---
 
-
 Here is a link to my Github repo:
 
 https://github.com/cthulhudreaming/urgent_fury.git
@@ -16,6 +15,9 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(readxl)
 library(janitor)
+
+regime <- read_excel("raw-data/all_regimes.xls") %>% 
+  clean_names()
 
 autocracy <- read_excel("raw-data/autocracies.xlsx") %>% 
   clean_names()
@@ -28,5 +30,7 @@ coups <- coups %>%
  
 polity <- read_excel("raw-data/polity_iv.xls") %>% 
   clean_names()
+
+
 ```
 
