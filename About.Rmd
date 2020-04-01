@@ -1,0 +1,42 @@
+---
+title: "About"
+author: "Nidal"
+date: "4/1/2020"
+output: html_document
+---
+
+For my final project, I am investigating one of the core questions of my
+fall Freshmen Seminar: Are democracies or autocracies more vulnerable to 
+espionage and subversion?
+
+I gathered four datasets:
+
+The Polity IV dataset from the Polity IV Project, led by Monty Marshall and 
+Ted Robert Gurr. This dataset assigns each country a numerical value based on
+the spectrum of autocratic regimes to democratic regimes. It ranges from -10, 
+which denotes a hereditary monarchy, to +10 which denotes a consolidated
+democracy.
+http://www.systemicpeace.org/polity/polity4x.htm
+
+The Autocratic Regime dataset, created by Barbara Geddes, Joseph Wright, and
+Erica Frantz and published in 2014. This dataset examines the particular 
+features of autocratic regimes.
+https://sites.psu.edu/dictators/
+
+The All Political Regimes dataset created by Barbara Geddes, Joseph Wright, and
+Erica Frantz and published in 2014. This dataset examines the particular
+features of every regime type.
+https://sites.psu.edu/dictators/
+
+The Coup D'Etat dataset from the Coup D'Etat Project. This project tracks 
+coups d'etat in 165 post-WWII, and categorizes each one by success or failure,
+in addition to coup attemps and conspiracies.
+https://clinecenter.illinois.edu/project/research-themes/democracy-and-development/coup-detat-project-cdp
+
+I plan to first join the Polity-IV, Autocratic regime, and all political regimes
+datasets together by country name to obtain the regime type of each country and
+its features, in addition to their polity scores.
+
+I will then join the coup data to this dataset, and the I will analyze which 
+variables have the largest impact on coup attempts and success by using linear
+regression.
