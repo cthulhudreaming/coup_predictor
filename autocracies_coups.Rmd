@@ -1,5 +1,5 @@
 ---
-title: "autocracies_coups"
+title: "coups"
 author: "Nidal"
 date: "4/1/2020"
 output: html_document
@@ -15,6 +15,7 @@ library(gifski)
 library(janitor)
 library(gganimate)
 library(readxl)
+library(infer)
 
 coups <- read_excel("raw-data/Coupdata.xls") %>% 
   clean_names()
@@ -39,5 +40,29 @@ clean_polity <- polity %>%
 join_copo <- clean_coups %>% 
   inner_join(clean_polity, by = c("year_of_event" = "year", 
                                   "country_where_action_occurred" = "country"))
+```
+
+```{r}
+
+coup_data <- join_copo %>%
+  group_by(polity, realized_coup) %>% 
+  count(realized_coup) %>% 
+  mutate(number = n)
+
+
+coup_sample <- coup_data %>% 
+  rep_sample_n(size = nrow(coup_data), reps = 1000, replace = TRUE) %>% 
+  group_by(replicate, polity) %>% 
+  summarize(sum = sum(number))
+
+```
+
+
+
+```{r}
+
+ggplot(coup_sample, aes(x = polity, y = sum)) + 
+  geom_point() +
+  scale_y_continuous(trans = "log2")
 ```
 
