@@ -1,0 +1,32 @@
+---
+title: "gather"
+author: "Nidal"
+date: "4/1/2020"
+output: html_document
+---
+
+
+Here is a link to my Github repo:
+
+https://github.com/cthulhudreaming/urgent_fury.git
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+
+autocracy <- read_excel("raw-data/autocracies.xlsx") %>% 
+  clean_names()
+
+coups <- read_excel("raw-data/Coupdata.xls") %>% 
+  clean_names()
+
+coups <- coups %>% 
+  select(cow_code, country_where_action_occurred, year_of_event, month_of_event, day_of_event, type_of_coup, realized_coup, unrealized, military_coup, rebel_coup, palace_coup)
+ 
+polity <- read_excel("raw-data/polity_iv.xls") %>% 
+  clean_names()
+```
+
