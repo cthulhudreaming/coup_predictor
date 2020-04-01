@@ -50,7 +50,7 @@ coup_data <- join_copo %>%
   count(type_of_coup) %>% 
   mutate(number = n)
 
-
+write.csv(coup_data, "Coups/coup_data.csv")
 ```
 
 ```{r plot}
@@ -67,12 +67,34 @@ simple_graph <- ggplot(coup_data,
     caption = "Data from the Polity IV Project and the Coup d'Etat Project") +
   theme_classic()
 
+simple_graph + facet_wrap(~type_of_coup)
+
+attempts <- coup_data %>% 
+  filter(type_of_coup == "attempt") %>% 
+  ggplot(aes(polity, y = number, color = type_of_coup)) + 
+  geom_jitter(width = 0.5, height = 0.5)
+ggsave("attempt.png", path = "Coups")
+
+consp <- coup_data %>% 
+  filter(type_of_coup == "conspiracy") %>% 
+  ggplot(aes(polity, y = number, color = type_of_coup)) + 
+  geom_jitter(width = 0.5, height = 0.5)
+ggsave("consp.png", path = "Coups")
+
+coup <- coup_data %>% 
+  filter(type_of_coup == "coup") %>% 
+  ggplot(aes(polity, y = number, color = type_of_coup)) + 
+  geom_jitter(width = 0.5, height = 0.5)
+ggsave("coup.png", path = "Coups")
 ```
+
 
 ```{r graph_fun}
 
 simple_graph +
   transition_manual(type_of_coup)
+
+anim_save("coups1.gif", path = "Coups")
 
 ```
 
