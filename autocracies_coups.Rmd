@@ -42,27 +42,21 @@ join_copo <- clean_coups %>%
                                   "country_where_action_occurred" = "country"))
 ```
 
-```{r}
+```{r sample}
 
 coup_data <- join_copo %>%
-  group_by(polity, realized_coup) %>% 
-  count(realized_coup) %>% 
+  rep_sample_n(size = nrow(coup_data), reps = 50, replace = TRUE) %>% 
+  group_by(polity, realized_coup, type_of_coup, replicate) %>% 
+  count(type_of_coup) %>% 
   mutate(number = n)
 
 
-coup_sample <- coup_data %>% 
-  rep_sample_n(size = nrow(coup_data), reps = 1000, replace = TRUE) %>% 
-  group_by(replicate, polity) %>% 
-  summarize(sum = sum(number))
-
 ```
 
+```{r plot}
 
-
-```{r}
-
-ggplot(coup_sample, aes(x = polity, y = sum)) + 
-  geom_point() +
-  scale_y_continuous(trans = "log2")
+ggplot(coup_data, aes(x = polity, y = number, color = type_of_coup)) + 
+  geom_jitter(width = 0.5, height = 0.5) +
+  theme_classic()
 ```
 
