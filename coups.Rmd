@@ -44,6 +44,8 @@ join_copo <- clean_coups %>%
 
 ```{r sample}
 
+set.seed(2)
+
 coup_data <- join_copo %>%
   rep_sample_n(size = nrow(join_copo), reps = 50, replace = TRUE) %>% 
   group_by(polity, realized_coup, type_of_coup, replicate) %>% 

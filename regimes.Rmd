@@ -1,0 +1,51 @@
+---
+title: "regimes"
+author: "Nidal"
+date: "4/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+
+library(tidyverse)
+library(gifski)
+library(janitor)
+library(gganimate)
+library(readxl)
+library(infer)
+
+regime_polity <- read_excel("raw-data/polity_iv.xls") %>% 
+  clean_names() %>% 
+  select(year, ccode, country, scode, polity) %>% 
+  filter(year >= "1946") %>% 
+  filter(polity != "-88") %>% 
+  filter(polity != "-77") %>% 
+  filter(polity != "-66")
+
+regime_coup <- read_excel("raw-data/Coupdata.xls") %>% 
+  clean_names() %>% 
+  select(year_of_event, cow_code, country_where_action_occurred, type_of_coup, 
+         realized_coup, unrealized)
+
+```
+
+```{r turkey}
+
+turkey_polity <- regime_polity %>% 
+  filter(scode == "TUR") %>% 
+  filter(year %in% (1959:1998))
+
+ggplot(turkey_polity, aes(x = year, y = polity)) +
+  geom_line()
+
+turkey_coups <- regime_coup %>% 
+  filter(cow_code == 640)
+
+
+
+
+```
+
