@@ -46,13 +46,24 @@ join_copo <- clean_coups %>%
 
 set.seed(2)
 
+coups <- join_copo %>% 
+  group_by(polity) %>% 
+  summarize(sum = sum(realized_coup + unrealized)) 
+  
+
+coups %>% 
+  summarize(correlation = cor(sum, polity))
+
+
+
 coup_data <- join_copo %>%
   rep_sample_n(size = nrow(join_copo), reps = 50, replace = TRUE) %>% 
-  group_by(polity, realized_coup, type_of_coup, replicate) %>% 
-  count(type_of_coup) %>% 
-  mutate(number = n)
+  group_by(polity, realized_coup, unrealized, type_of_coup, replicate) %>% 
+  summarize(num = sum(realized_coup + unrealized)) %>% 
+  mutate(number = num)
+  
 
-write.csv(coup_data, "Coups/coup_data.csv")
+
 ```
 
 ```{r plot}
@@ -75,19 +86,19 @@ attempts <- coup_data %>%
   filter(type_of_coup == "attempt") %>% 
   ggplot(aes(polity, y = number, color = type_of_coup)) + 
   geom_jitter(width = 0.5, height = 0.5)
-ggsave("attempt.png", path = "Coups")
+
 
 consp <- coup_data %>% 
   filter(type_of_coup == "conspiracy") %>% 
   ggplot(aes(polity, y = number, color = type_of_coup)) + 
   geom_jitter(width = 0.5, height = 0.5)
-ggsave("consp.png", path = "Coups")
+
 
 coup <- coup_data %>% 
   filter(type_of_coup == "coup") %>% 
   ggplot(aes(polity, y = number, color = type_of_coup)) + 
   geom_jitter(width = 0.5, height = 0.5)
-ggsave("coup.png", path = "Coups")
+
 ```
 
 
