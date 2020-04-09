@@ -57,8 +57,7 @@ coups %>%
 
 
 coup_data <- join_copo %>%
-  rep_sample_n(size = nrow(join_copo), reps = 50, replace = TRUE) %>% 
-  group_by(polity, realized_coup, unrealized, type_of_coup, replicate) %>% 
+  group_by(polity, realized_coup, unrealized, type_of_coup) %>% 
   summarize(num = sum(realized_coup + unrealized)) %>% 
   mutate(number = num)
   
