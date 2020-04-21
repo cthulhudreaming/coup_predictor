@@ -17,6 +17,8 @@ library(gganimate)
 library(readxl)
 library(infer)
 
+# For the relationship between regime type and coup success
+
 regime_polity <- read_excel("raw-data/polity_iv.xls") %>% 
   clean_names() %>% 
   select(year, ccode, country, scode, polity) %>% 
@@ -25,27 +27,35 @@ regime_polity <- read_excel("raw-data/polity_iv.xls") %>%
   filter(polity != "-77") %>% 
   filter(polity != "-66")
 
-regime_coup <- read_excel("raw-data/Coupdata.xls") %>% 
+coups <- read_excel("raw-data/Coupdata.xls") %>% 
+  clean_names()
+
+regime_coups <- coups %>% 
+  select(cow_code, country_where_action_occurred, year_of_event, month_of_event, day_of_event, type_of_coup, realized_coup, unrealized, military_coup, rebel_coup, palace_coup)
+
+autocracy <- read_excel("raw-data/autocracies.xlsx") %>% 
   clean_names() %>% 
-  select(year_of_event, cow_code, country_where_action_occurred, type_of_coup, 
-         realized_coup, unrealized)
+  select(cowcode, gwf_country, gwf_regimetype, gwf_startyr, gwf_endyr, gwf_howend)
+
+democracy <- read_excel("raw-data/all_regimes.xls") %>% 
+  clean_names() %>% 
+  filter(regime_type == "democracy") %>% 
+  select(country, regime_type)
+
 
 ```
 
-```{r turkey}
+```{r monarchy}
 
-turkey_polity <- regime_polity %>% 
-  filter(scode == "TUR") %>% 
-  filter(year %in% (1959:1998))
+monarchy <- autocracy %>% 
+  filter(gwf_regimetype == "monarchy")
 
-ggplot(turkey_polity, aes(x = year, y = polity)) +
-  geom_line()
+```
 
-turkey_coups <- regime_coup %>% 
-  filter(cow_code == 640)
+```{r military}
 
-
-
+military <- autocracy %>% 
+  filter(gwf_regimetype == "military")
 
 ```
 

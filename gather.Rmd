@@ -32,5 +32,58 @@ polity <- read_excel("raw-data/polity_iv.xls") %>%
   clean_names()
 
 
+
+```
+
+
+```{r}
+
+
+bases <- read_excel("raw-data/bases.xlsx") %>% 
+  clean_names() %>% 
+  group_by(country_territory_name) %>% 
+  count()
+
+bases$country_territory_name <- tolower(bases$country_territory_name)
+
+literacy <- read_excel("raw-data/literacy.xls", 
+                       skip = 2) %>% 
+  clean_names() %>% 
+  select(-indicator_name, -indicator_code)
+
+literacy <- literacy %>% 
+  pivot_longer(
+    cols = starts_with("x"),
+    names_to = "year",
+    values_to = "literacy_rate",
+    names_prefix = "x")
+
+
+births <- read_excel("raw-data/births.xls", 
+                     skip = 2) %>% 
+  clean_names() %>% 
+  select(-indicator_name, -indicator_code)
+
+births <- births %>% 
+  pivot_longer(
+    cols = starts_with("x"),
+    names_to = "year",
+    values_to = "birth_rate",
+    names_prefix = "x")
+
+
+deaths <- read_excel("raw-data/deaths.xls",
+                     skip = 2) %>% 
+  clean_names() %>% 
+  select(-indicator_name, -indicator_code)
+
+deaths <- deaths %>% 
+  pivot_longer(
+   cols =  starts_with("x"),
+    names_to = "year",
+   values_to = "death_rate",
+   names_prefix = "x")
+
+
 ```
 
