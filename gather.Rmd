@@ -1,63 +1,108 @@
 ---
-title: "gather"
-author: "Nidal"
-date: "4/1/2020"
+title: "Cleaning"
 output: html_document
 ---
 
-Here is a link to my Github repo:
-
-https://github.com/cthulhudreaming/urgent_fury.git
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE)
 
 library(tidyverse)
 library(readxl)
 library(janitor)
+library(xml2)
+library(rvest)
 
-regime <- read_excel("raw-data/all_regimes.xls") %>% 
-  clean_names()
+```
 
-autocracy <- read_excel("raw-data/autocracies.xlsx") %>% 
-  clean_names()
+```{r codes}
+
+# This is a list of codes that are assigned to each country. I plan to join
+# this dataset with my military base dataset so I can then easily join the 
+# joined dataset with my other ones.
+
+codes <- read_csv("raw-data/COW.csv") %>% 
+  clean_names() %>% 
+  select(c_code, state_nme)
+
+```
+
+
+```{r coups}
 
 coups <- read_excel("raw-data/Coupdata.xls") %>% 
   clean_names()
 
 coups <- coups %>% 
   select(cow_code, country_where_action_occurred, year_of_event, month_of_event, day_of_event, type_of_coup, realized_coup, unrealized, military_coup, rebel_coup, palace_coup)
- 
-polity <- read_excel("raw-data/polity_iv.xls") %>% 
-  clean_names()
 
+coups <- coups %>% 
+  filter(year_of_event == 1989) %>% 
+  select(cow_code, country_where_action_occurred, realized_coup)
+
+```
+
+
+```{r polity}
+
+polity <- read_excel("raw-data/polity_iv.xls") %>% 
+  clean_names() %>% 
+  filter(year == 1989) %>% 
+  select(ccode, country, polity)
+
+```
+
+```{r bases}
+
+bases <- read_excel("raw-data/basesabroad.xlsx", sheet = "1989", skip = 13) %>% 
+  clean_names() %>% 
+  rename("base_name" = x2) 
+
+bases$country_name <- tolower(bases$country_name)
+
+yes_bases <- bases %>% 
+  select(country_name, base_name) %>% 
+  filter(!is.na(base_name)) %>% 
+  group_by(country_name) %>% 
+  count()
+
+# I previously saved the yes_bases dataframe as a .csv file. Then, I manually
+# cleaned the data in the "Numbers" Mac application, as the dataframe contained
+# many territories that were not countries and formatted the country names 
+# oddly. I reformatted the country names so I could eventually join this dataset
+# with my other ones. The dataset that I cleaned manually is called 
+# "clean_bases.csv". Here I am reading in that dataset and cleaning the names
+# again, and only selecting the relevant columns.
+
+bases_clean <- read_csv("clean-data/clean_bases.csv") %>% 
+  clean_names() %>% 
+  select(country_name, n)
+
+```
+
+```{r infant}
+
+infant <- read_excel("raw-data/infant_mort.xls", 
+                       skip = 2) %>% 
+  clean_names() %>% 
+  select(-indicator_name, -indicator_code)
+
+infant <- infant %>% 
+  pivot_longer(
+    cols = starts_with("x"),
+    names_to = "year",
+    values_to = "infant_mortality_rate",
+    names_prefix = "x")
+
+infant_clean <- infant %>% 
+  filter(year == 1989)
 
 
 ```
 
 
-```{r}
-
-
-bases <- read_excel("raw-data/bases.xlsx") %>% 
-  clean_names() %>% 
-  group_by(country_territory_name) %>% 
-  count()
-
-bases$country_territory_name <- tolower(bases$country_territory_name)
-
-literacy <- read_excel("raw-data/literacy.xls", 
-                       skip = 2) %>% 
-  clean_names() %>% 
-  select(-indicator_name, -indicator_code)
-
-literacy <- literacy %>% 
-  pivot_longer(
-    cols = starts_with("x"),
-    names_to = "year",
-    values_to = "literacy_rate",
-    names_prefix = "x")
-
+```{r births}
 
 births <- read_excel("raw-data/births.xls", 
                      skip = 2) %>% 
@@ -70,6 +115,14 @@ births <- births %>%
     names_to = "year",
     values_to = "birth_rate",
     names_prefix = "x")
+
+clean_births <- births %>% 
+  filter(year == 1989)
+
+```
+
+
+```{r deaths}
 
 
 deaths <- read_excel("raw-data/deaths.xls",
@@ -84,6 +137,25 @@ deaths <- deaths %>%
    values_to = "death_rate",
    names_prefix = "x")
 
+clean_deaths <- deaths %>% 
+  filter(year == 1989)
+
+```
+
+
+```{r gov_type}
+
+url <- "https://www.cia.gov/library/publications/the-world-factbook/fields/299.html"
+
+countries <- url %>% 
+  read_html() %>% 
+  html_nodes(xpath = '//*[@id="fieldListing"]') %>% 
+  html_table()
+
+countries <- data.frame(countries)
+
+countries <- countries %>% 
+  clean_names()
 
 ```
 

@@ -1,47 +1,69 @@
----
-title: "About"
-author: "Nidal"
-date: "4/1/2020"
-output: html_document
----
 
-For my final project, I am investigating one of the core questions of my
-fall Freshmen Seminar: Are democracies or autocracies more vulnerable to 
-espionage and subversion?
+## Background
 
-I gathered four datasets:
+The goal of this project was to determine what factors determine the 
+success of a coup d'etat. In addition, I wanted to see if autocratic countries
+were more vulnerable to coups d'etat than democratic countries, or vice-versa.
 
-The Polity IV dataset from the Polity IV Project, led by Monty Marshall and 
-Ted Robert Gurr. This dataset assigns each country a numerical value based on
-the spectrum of autocratic regimes to democratic regimes. It ranges from -10, 
-which denotes a hereditary monarchy, to +10 which denotes a consolidated
-democracy.
-http://www.systemicpeace.org/polity/polity4x.htm
+I got the idea for the first part of this project while reading Edward 
+N. Luttwak's infamous book "Coup d'Etat: a practical handbook," which inspired
+various countries to "coup proof" their governments after it was first released
+in 1968. In the second chapter, Luttwak argues that there are three criteria
+that determine the success of a coup in a country:
 
-The Autocratic Regime dataset, created by Barbara Geddes, Joseph Wright, and
-Erica Frantz and published in 2014. This dataset examines the particular 
-features of autocratic regimes.
-https://sites.psu.edu/dictators/
+1. Economic backwardness
+2. Lack of foreign influence
+3. A highly centralized government
 
-The All Political Regimes dataset created by Barbara Geddes, Joseph Wright, and
-Erica Frantz and published in 2014. This dataset examines the particular
-features of every regime type.
-https://sites.psu.edu/dictators/
+According to Luttwak, in order for a coup to succeed, a country must not be 
+economically developed. In "economically backwards" countries, political
+participation is reserved for the elite, as poverty becomes a barrier to 
+political participation. He posited a few measures of "economic backwardness"
+such as high birth and death rates. 
 
-The Coup D'Etat dataset from the Coup D'Etat Project. This project tracks 
-coups d'etat in 165 post-WWII, and categorizes each one by success or failure,
-in addition to coup attemps and conspiracies.
-https://clinecenter.illinois.edu/project/research-themes/democracy-and-development/coup-detat-project-cdp
+In addition, Luttwak stated that a country must be free of foreign influence
+in order for a coup to be successful. He argued that if a foreign power has 
+a large military or political presence in the country, one must obtain the 
+foreign power's permission before attempting a coup, or else it would fail.
 
-I plan to first join the Polity-IV, Autocratic regime, and all political regimes
-datasets together by country name to obtain the regime type of each country and
-its features, in addition to their polity scores.
+Lastly, Luttwak wrote that a country needs to have a highly centralized 
+government in order to a coup to succeed, as there would only be one center
+of power to capture.
 
-I will then join the coup data to this dataset, and the I will analyze which 
-variables have the largest impact on coup attempts and success by using linear
-regression.
+I got the idea for the second part of this project from my fall freshman
+seminar, "The Political Significance of Espionage and Subversion." A central
+question of the class was whether or not "autocracies" or "democracies" are
+more vulnerable to political subversion. Since coups are arguably the 
+ultimate form of political subversion, I wanted to see if coups were more 
+common in "autocracies" or "democracies."
 
-I will also use a datset of US military bases abroad.
+## The Data
 
-Anyone is free to use and cite this data, but please credit: David Vine, "Lists of U.S. Military Bases Abroad, 1776-2019," American University Digital Research Archive, 2019, https://doi.org/10.17606/vfyb-nc07.
+To look at coups d'etats by country, I used a [dataset](https://clinecenter.illinois.edu/project/research-themes/democracy-and-development/coup-detat-project-cdp) from the Coup d'Etat Project at the University of 
+Illinois LAS.
+
+To measure "economic backwardness," I chose three indicators from the World Bank:
+
+1. Adult literacy [rates](https://data.worldbank.org/indicator/SE.ADT.LITR.ZS?view=chart)
+2. Birth rates per 1000 [people](https://data.worldbank.org/indicator/SP.DYN.CBRT.IN?view=chart)
+3. Infant mortality rates per 1000 [live births](https://data.worldbank.org/indicator/SH.DYN.NMRT)
+
+To measure "foreign influence," I used a [dataset](https://doi.org/10.17606/vfyb-nc07) 
+that tracks US military bases abroad.
+
+To measure the extent of power centralization, I scraped a table from the 
+[CIA World Factbook](https://www.cia.gov/library/publications/the-world-factbook/fields/299.html) that lists each country and the government type.
+
+To measure how democratic or autocratic a country is, I used the Polity IV 
+[dataset](http://www.systemicpeace.org/polity/polity4x.htm), where -10 is most 
+autocratic and +10 is more democratic.
+
+### Disclaimer:
+
+For my project, I filtered every dataset to only look at the observations for 
+the year 1989. Many of the variables I chose change from year to year, so I 
+needed to keep the year constant. So, my full dataset only contains observations
+from the year 1989, and so my prediction model is only based on observation from
+the year 1989, and may accurately the likelihood of a successful coup using 
+more current data. My choice of the year 1989 was arbitrary.
 
