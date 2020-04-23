@@ -1,0 +1,27 @@
+---
+title: "data"
+author: "Nidal"
+date: "4/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(readr)
+library(janitor)
+
+load("clean-data/births.rds")
+load("clean-data/literacy.rds")
+load("clean-data/coups.rds")
+load("clean-data/deaths.rds")
+load("clean-data/gov_type.rds")
+
+bases_clean <- read_csv("clean-data/clean_bases.csv") %>% 
+  clean_names() %>% 
+  select(country_name, n)
+
+
+```
+

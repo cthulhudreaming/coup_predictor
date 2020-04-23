@@ -1,7 +1,4 @@
----
-title: "Cleaning"
-output: html_document
----
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,
@@ -15,6 +12,7 @@ library(xml2)
 library(rvest)
 
 ```
+
 
 ```{r codes}
 
@@ -38,7 +36,7 @@ coups <- coups %>%
   select(cow_code, country_where_action_occurred, year_of_event, month_of_event, day_of_event, type_of_coup, realized_coup, unrealized, military_coup, rebel_coup, palace_coup)
 
 coups <- coups %>% 
-  filter(year_of_event == 1989) %>% 
+  filter(year_of_event == 1991) %>% 
   select(cow_code, country_where_action_occurred, realized_coup)
 
 ```
@@ -48,7 +46,7 @@ coups <- coups %>%
 
 polity <- read_excel("raw-data/polity_iv.xls") %>% 
   clean_names() %>% 
-  filter(year == 1989) %>% 
+  filter(year == 1991) %>% 
   select(ccode, country, polity)
 
 ```
@@ -75,9 +73,10 @@ yes_bases <- bases %>%
 # "clean_bases.csv". Here I am reading in that dataset and cleaning the names
 # again, and only selecting the relevant columns.
 
-bases_clean <- read_csv("clean-data/clean_bases.csv") %>% 
+bases_clean <- read_csv("raw-data/clean_bases.csv") %>% 
   clean_names() %>% 
   select(country_name, n)
+
 
 ```
 
@@ -96,7 +95,13 @@ infant <- infant %>%
     names_prefix = "x")
 
 infant_clean <- infant %>% 
-  filter(year == 1989)
+  filter(year == 1991)
+
+infant_clean <- infant_clean %>% 
+  mutate(mort_rate = infant_mortality_rate/1000 * 100) %>% 
+  filter(!is.na(mort_rate)) %>% 
+  select(country_code, country_name, mort_rate)
+
 
 
 ```
@@ -117,7 +122,9 @@ births <- births %>%
     names_prefix = "x")
 
 clean_births <- births %>% 
-  filter(year == 1989)
+  filter(year == 1991) %>% 
+  filter(!is.na(birth_rate)) %>% 
+  select(country_code, country_name, birth_rate)
 
 ```
 
@@ -138,7 +145,32 @@ deaths <- deaths %>%
    names_prefix = "x")
 
 clean_deaths <- deaths %>% 
-  filter(year == 1989)
+  filter(year == 1991) %>% 
+  filter(!is.na(death_rate)) %>% 
+  select(country_code, country_name, death_rate)
+
+```
+
+
+```{r join}
+
+join1 <- full_join(infant_clean, clean_births, by = c("country_name" = "country_name",
+                                                      "country_code" = "country_code"))
+
+dev_indc <- full_join(join1, clean_deaths, by = c("country_name" = "country_name",
+                                                  "country_code" = "country_code"))
+
+bases_dev <- full_join(dev_indc, bases_clean, by = c("country_name" = "country_name"))
+
+bases_dev$n[is.na(bases_dev$n)] <- 0
+
+full_clean <- bases_dev %>% 
+  mutate(level_infl = case_when(n %in% 1:10 ~ '3',
+                                n %in% 10:50 ~ '2',
+                                n > 50 ~ '1',
+                                TRUE ~ '4')) %>% 
+  filter(!is.na(mort_rate))
+
 
 ```
 
@@ -156,6 +188,54 @@ countries <- data.frame(countries)
 
 countries <- countries %>% 
   clean_names()
+
+clean_countries <- countries %>% 
+  mutate(control = case_when(
+    str_detect(government_type, "absolute monarchy") ~ '1',
+    str_detect(government_type, "communist") ~ '1',
+    str_detect(government_type, "semi-presidential") ~ '2',
+    str_detect(government_type, "federal parliamentary") ~ '3',
+    str_detect(government_type, "federal republic") ~ '3',
+    str_detect(government_type, "federation") ~ '3',
+    str_detect(government_type, "presidential") ~ '3',
+    str_detect(government_type, "parliamentary republic") ~ '2',
+    str_detect(government_type, "constitutional monarchy") ~ '2',
+    str_detect(government_type, "parliamentary democracy") ~ '2',
+    str_detect(government_type, "theocratic republic") ~ '2')) %>% 
+  filter(!is.na(control))
+
+
+```
+
+
+```{r final_join}
+
+coups_dev <- full_join(full_clean, coups, by = c("country_name" = "country_where_action_occurred")) %>% 
+  select(country_name, mort_rate, birth_rate, death_rate, level_infl, realized_coup)
+
+coups_dev$realized_coup[is.na(coups_dev$realized_coup)] <- 0
+
+```
+
+```{r}
+
+# I realized that the above dataset was not completely clean. Some rows didn't
+# contain observations for individual countries, but whole regions or income
+# groups. I decided to write the data to a csv file to clean it manually. Here
+# I am reading in that csv file.
+
+clean_coups_dev <- read_csv("clean2.csv") %>% 
+  select(-X1)
+
+coup_country <- full_join(clean_coups_dev, clean_countries, 
+                  by = c("country_name" = "country")) %>% 
+  select(-government_type) %>% 
+  filter(!is.na(mort_rate)) %>% 
+  filter(!is.na(birth_rate)) %>% 
+  filter(!is.na(death_rate)) %>% 
+  filter(!is.na(level_infl)) %>% 
+  filter(!is.na(realized_coup)) %>% 
+  filter(!is.na(control))
 
 ```
 
