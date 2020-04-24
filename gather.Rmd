@@ -237,5 +237,7 @@ coup_country <- full_join(clean_coups_dev, clean_countries,
   filter(!is.na(realized_coup)) %>% 
   filter(!is.na(control))
 
+save(coup_country, file = "data/coup_data.rds")
+
 ```
 

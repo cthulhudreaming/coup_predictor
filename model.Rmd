@@ -1,0 +1,78 @@
+---
+title: "Model"
+author: "Nidal"
+date: "4/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+library(infer)
+library(tidyverse)
+library(tidymodels)
+library(rpart.plot)
+
+load("data/coup_data.rds")
+
+coup_country <- coup_country %>% 
+rename(gov = control)
+coup_country$realized_coup <- as_factor(coup_country$realized_coup)
+coup_country$level_infl <- as.character(coup_country$level_infl)
+
+save(coup_country, file = "urgent_fury/coup_data_final.rds")
+
+```
+
+```{r models}
+
+logistic_mod <- logistic_reg() %>% 
+  set_engine("glm")
+
+forest_mod <- rand_forest(mtry = 7, trees = 50) %>% 
+  set_engine("randomForest") %>% 
+  set_mode("classification")
+
+```
+
+```{r}
+
+
+
+logistic_fit <- fit(logistic_mod,
+                    realized_coup ~ mort_rate + birth_rate + death_rate + 
+                    level_infl + gov,
+                    data = coup_country)
+
+save(logistic_fit, file = "urgent_fury/logistic_mod.rda")
+
+logistic_fit$fit %>% 
+  tidy(conf.int = T) %>% 
+  select(term, estimate, conf.low, conf.high)
+
+
+forest_fit <- fit(forest_mod,
+                  realized_coup ~ mort_rate + birth_rate + death_rate + 
+                    level_infl + gov,
+                  data = coup_country)
+
+
+```
+
+```{r test}
+
+country_a <- tibble(
+  mort_rate = 25,
+  birth_rate = 49,
+  level_infl = '3',
+  death_rate = 22,
+  gov = '1')
+
+predict(logistic_fit, new_data = country_a)
+predict(forest_fit, new_data = country_a)
+
+
+
+```
+
