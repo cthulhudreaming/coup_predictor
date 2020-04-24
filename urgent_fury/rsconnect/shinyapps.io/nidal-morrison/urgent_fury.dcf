@@ -1,0 +1,12 @@
+name: urgent_fury
+title: urgent_fury
+username:
+account: nidal-morrison
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2176362
+bundleId: 3058059
+url: https://nidal-morrison.shinyapps.io/urgent_fury/
+when: 1587703989.03064
+asMultiple: FALSE
+asStatic: FALSE

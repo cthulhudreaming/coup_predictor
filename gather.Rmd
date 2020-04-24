@@ -224,7 +224,7 @@ coups_dev$realized_coup[is.na(coups_dev$realized_coup)] <- 0
 # groups. I decided to write the data to a csv file to clean it manually. Here
 # I am reading in that csv file.
 
-clean_coups_dev <- read_csv("clean2.csv") %>% 
+clean_coups_dev <- read_csv("raw-data/clean2.csv") %>% 
   select(-X1)
 
 coup_country <- full_join(clean_coups_dev, clean_countries, 

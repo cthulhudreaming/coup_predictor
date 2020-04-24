@@ -4,6 +4,8 @@ library(shiny)
 library(tidyverse)
 library(shinythemes)
 library(tidymodels)
+library(rstanarm)
+library(Rcpp)
 
 
 load("coup_data_final.rds")
@@ -20,7 +22,7 @@ logistic_fit <- fit(logistic_mod,
                         level_infl + gov,
                     data = coup_country)
 
-forest_mod <- rand_forest(mtry = 7, trees = 50) %>% 
+forest_mod <- rand_forest(trees = 50) %>% 
     set_engine("randomForest") %>% 
     set_mode("classification")
 
@@ -183,7 +185,7 @@ server <- function(input, output, session) {
         gov <- as.integer(input$gov)
         
         temp <- cbind(mort_rate, birth_rate, death_rate, level_infl, gov)
-        temp <- as.data.frame(temp)
+        temp <- as_data_frame(temp)
         
         temp$realized_coup <- ""
         

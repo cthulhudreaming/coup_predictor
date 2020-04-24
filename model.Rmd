@@ -73,6 +73,5 @@ predict(logistic_fit, new_data = country_a)
 predict(forest_fit, new_data = country_a)
 
 
-
 ```
 
