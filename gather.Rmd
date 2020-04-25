@@ -199,13 +199,13 @@ countries <- countries %>%
 
 clean_countries <- countries %>% 
   mutate(control = case_when(
-    str_detect(government_type, "absolute monarchy") ~ '1',
-    str_detect(government_type, "communist") ~ '1',
+    str_detect(government_type, "absolute monarchy") ~ '3',
+    str_detect(government_type, "communist") ~ '3',
     str_detect(government_type, "semi-presidential") ~ '2',
-    str_detect(government_type, "federal parliamentary") ~ '3',
-    str_detect(government_type, "federal republic") ~ '3',
-    str_detect(government_type, "federation") ~ '3',
-    str_detect(government_type, "presidential") ~ '3',
+    str_detect(government_type, "federal parliamentary") ~ '1',
+    str_detect(government_type, "federal republic") ~ '1',
+    str_detect(government_type, "federation") ~ '1',
+    str_detect(government_type, "presidential") ~ '1',
     str_detect(government_type, "parliamentary republic") ~ '2',
     str_detect(government_type, "constitutional monarchy") ~ '2',
     str_detect(government_type, "parliamentary democracy") ~ '2',
@@ -251,14 +251,34 @@ save(coup_country, file = "data/coup_data.rds")
 
 ```{r}
 
-regime_full <- full_join(coups_regime, polity_regime, 
+regime_coups <- full_join(coups_regime, polity_regime, 
                          by = c("cow_code" = "ccode",
                                 "country_where_action_occurred" = "country",
                                 "year_of_event" = "year"))
-regime_full <- regime_full %>% 
+regime_coups <- regime_coups %>% 
   filter(polity != -88) %>% 
   filter(polity != -77) %>% 
   filter(polity != -66)
+
+not_clean_countries <- countries %>% 
+  mutate(control = case_when(
+    str_detect(government_type, "absolute monarchy") ~ '3',
+    str_detect(government_type, "communist") ~ '3',
+    str_detect(government_type, "semi-presidential") ~ '2',
+    str_detect(government_type, "federal parliamentary") ~ '1',
+    str_detect(government_type, "federal republic") ~ '1',
+    str_detect(government_type, "federation") ~ '1',
+    str_detect(government_type, "presidential") ~ '1',
+    str_detect(government_type, "parliamentary republic") ~ '2',
+    str_detect(government_type, "constitutional monarchy") ~ '2',
+    str_detect(government_type, "parliamentary democracy") ~ '2',
+    str_detect(government_type, "theocratic republic") ~ '2')) %>% 
+  filter(!is.na(control))
+
+regime_full <- full_join(regime_coups, not_clean_countries, 
+                         by = c("country_where_action_occurred" = "country")) %>% 
+  filter(!is.na(realized_coup)) %>% 
+  filter(!is.na(polity))
 
 save(regime_full, file = "data/regime_coup.rds")
 

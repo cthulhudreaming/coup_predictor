@@ -17,36 +17,32 @@ library(janitor)
 library(tidymodels)
 library(rpart.plot)
 library(ggiraphExtra)
+library(moderndive)
+library(plotly)
 
+load("data/regime_coup.rds")
 
+regime_full$realized_coup <- as_factor(regime_full$realized_coup)
 
-polity <- read_excel("raw-data/polity_iv.xls") %>% 
-  clean_names() %>% 
-  filter(year == 1991) %>% 
-  select(country, polity)
-
-coup_polity <- full_join(coup_country, polity, 
-                         by = c("country_name" = "country")) %>% 
-  filter(!is.na(polity)) %>% 
-  filter(!is.na(mort_rate)) %>% 
-  filter(!is.na(birth_rate)) %>% 
-  filter(!is.na(death_rate)) %>% 
-  filter(!is.na(control)) %>% 
-  filter(!is.na(level_infl)) %>% 
-  filter(polity != -88,
-         polity != -66,
-         polity != -77)
-
-coup_polity$realized_coup <- as_factor(coup_polity$realized_coup)
+regime_full <- regime_full %>% 
+  filter(!is.na(realized_coup)) %>% 
+  filter(!is.na(control))
 
 ```
 
 
 ```{r}
 
-x <- glm(realized_coup ~ mort_rate + level_infl + control, family = binomial, data = coup_polity) %>% 
-  ggPredict()
 
+x <- ggplot(regime_full, aes(x = control, y = polity, color = factor(realized_coup))) +
+  geom_jitter(aes(frame = year_of_event, ids = country_where_action_occurred)) +
+  labs(x = "Government centralization from 1 (least centralized) to 3 (most centralized)",
+       y = "Polity IV score (-10 is most autocratic, +10 is the most democratic",
+       color = "Coup outcome:") +
+  scale_color_discrete(labels = c("Failed", "Succeeded"))
+
+
+ggplotly(x)
 
 
   

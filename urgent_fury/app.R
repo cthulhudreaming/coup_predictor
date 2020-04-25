@@ -46,9 +46,9 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                      h6("4 = very little foreign influence"),
                      numericInput("gov", "How centralized is the government?",
                                   max = 3, min = 1, value = 2),
-                     h6("1 = Very centralized; e.g. absolute monarchies"),
+                     h6("1 = Not very centralized; e.g. federal presidential republicss"),
                      h6("2 = Somewhat centralized; e.g. parliamentray republics"),
-                     h6("3 = Not very centralized; e.g. federal presidential republics"),
+                     h6("3 = Very centralized; e.g. absolute monarchies"),
                      actionButton("run_model_log", "Run Logistic Model")),
                  mainPanel(
                      tabsetPanel(
@@ -93,7 +93,7 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                  p("My name is Nidal and I a member of Harvard College's class 
                    of 2023. This is my final project for GOV1005: Data. I hope
                    to concentrate in History with a Secondary in Government"))),
-    tabPanel("The Data",
+    tabPanel("The data",
              mainPanel(
                  h4("Methods"),
                  p("For this project, I had to essentially quantify Luttwak's
@@ -153,8 +153,14 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                   https://doi.org/10.17606/vfyb-nc07"),
                 p("I obtained the regime type data from the", a("CIA World Factbook",
                  href = "https://www.cia.gov/library/publications/the-world-factbook/fields/299.html"))
+             )),
+    tabPanel("Coups and regime type",
+             mainPanel(
+                 h4("Explore the relationship between government centralization, 
+                    regime type, and coup success")
              )
              )
+    
     
 )
 
