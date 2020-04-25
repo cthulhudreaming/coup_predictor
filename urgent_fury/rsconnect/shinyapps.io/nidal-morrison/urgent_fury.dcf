@@ -5,8 +5,9 @@ account: nidal-morrison
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2176362
-bundleId: 3058059
+bundleId: 3061742
 url: https://nidal-morrison.shinyapps.io/urgent_fury/
-when: 1587703989.03064
+when: 1587767314.8057
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: logistic_mod.rda

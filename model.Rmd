@@ -69,8 +69,8 @@ country_a <- tibble(
   death_rate = 22,
   gov = '1')
 
-predict(logistic_fit, new_data = country_a)
-predict(forest_fit, new_data = country_a)
+x <- predict(logistic_fit, new_data = country_a)
+y <- predict(forest_fit, new_data = country_a)
 
 
 ```

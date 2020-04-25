@@ -32,22 +32,30 @@ codes <- read_csv("raw-data/COW.csv") %>%
 coups <- read_excel("raw-data/Coupdata.xls") %>% 
   clean_names()
 
-coups <- coups %>% 
+coups_clean <- coups %>% 
   select(cow_code, country_where_action_occurred, year_of_event, month_of_event, day_of_event, type_of_coup, realized_coup, unrealized, military_coup, rebel_coup, palace_coup)
 
-coups <- coups %>% 
+coups <- coups_clean %>% 
   filter(year_of_event == 1991) %>% 
   select(cow_code, country_where_action_occurred, realized_coup)
+
+coups_regime <- coups_clean %>% 
+  select(cow_code, country_where_action_occurred, year_of_event, realized_coup)
 
 ```
 
 
 ```{r polity}
 
-polity <- read_excel("raw-data/polity_iv.xls") %>% 
-  clean_names() %>% 
+polity_raw <- read_excel("raw-data/polity_iv.xls") %>% 
+  clean_names() 
+
+polity <- polity_raw %>% 
   filter(year == 1991) %>% 
   select(ccode, country, polity)
+
+polity_regime <- polity_raw %>% 
+  select(ccode, country, year, polity)
 
 ```
 
@@ -238,6 +246,21 @@ coup_country <- full_join(clean_coups_dev, clean_countries,
   filter(!is.na(control))
 
 save(coup_country, file = "data/coup_data.rds")
+
+```
+
+```{r}
+
+regime_full <- full_join(coups_regime, polity_regime, 
+                         by = c("cow_code" = "ccode",
+                                "country_where_action_occurred" = "country",
+                                "year_of_event" = "year"))
+regime_full <- regime_full %>% 
+  filter(polity != -88) %>% 
+  filter(polity != -77) %>% 
+  filter(polity != -66)
+
+save(regime_full, file = "data/regime_coup.rds")
 
 ```
 

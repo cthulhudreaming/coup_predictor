@@ -22,14 +22,6 @@ logistic_fit <- fit(logistic_mod,
                         level_infl + gov,
                     data = coup_country)
 
-forest_mod <- rand_forest(trees = 50) %>% 
-    set_engine("randomForest") %>% 
-    set_mode("classification")
-
-forest_fit <- fit(forest_mod,
-                  realized_coup ~ mort_rate + birth_rate + death_rate + 
-                      level_infl + gov,
-                  data = coup_country)
 
 
 ui <- fluidPage(navbarPage("Urgent Fury",
@@ -57,12 +49,10 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                      h6("1 = Very centralized; e.g. absolute monarchies"),
                      h6("2 = Somewhat centralized; e.g. parliamentray republics"),
                      h6("3 = Not very centralized; e.g. federal presidential republics"),
-                     actionButton("run_model_log", "Run Logistic Model"),
-                     actionButton("run_model_forest", "Run RandomForest model")),
+                     actionButton("run_model_log", "Run Logistic Model")),
                  mainPanel(
                      tabsetPanel(
-                         tabPanel("Logistic", verbatimTextOutput("logis")),
-                         tabPanel("Random Forest", verbatimTextOutput("forest")))))),
+                         tabPanel("Model", tableOutput("logis")))))),
     tabPanel("About",
              mainPanel(
                  h4("Background"),
@@ -189,24 +179,20 @@ server <- function(input, output, session) {
         
         temp$realized_coup <- ""
         
+      
+        
         observeEvent(input$run_model_log, {
             
-            log_model <- logistic_fit
-            pred <- predict(log_model, new_data = temp)
-            output$logis <- renderPrint(pred)
+        
+            pred <- predict(logistic_fit, new_data = temp)
+            output$logis <- renderTable({pred})
         }
                      
             
         )
         
-        observeEvent(input$run_model_forest, {
             
-            forest_model <- forest_fit
-            pred_forest <- predict(forest_model, new_data = temp)
-            output$forest <- renderPrint(pred_forest)
-        }
-            
-        )
+        
     }
         
     )

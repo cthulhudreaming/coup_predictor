@@ -12,9 +12,43 @@ knitr::opts_chunk$set(echo = FALSE,
 
 library(tidyverse)
 library(broom)
+library(readxl)
+library(janitor)
+library(tidymodels)
+library(rpart.plot)
+library(ggiraphExtra)
 
-load("data/coup_data.rds")
 
 
+polity <- read_excel("raw-data/polity_iv.xls") %>% 
+  clean_names() %>% 
+  filter(year == 1991) %>% 
+  select(country, polity)
+
+coup_polity <- full_join(coup_country, polity, 
+                         by = c("country_name" = "country")) %>% 
+  filter(!is.na(polity)) %>% 
+  filter(!is.na(mort_rate)) %>% 
+  filter(!is.na(birth_rate)) %>% 
+  filter(!is.na(death_rate)) %>% 
+  filter(!is.na(control)) %>% 
+  filter(!is.na(level_infl)) %>% 
+  filter(polity != -88,
+         polity != -66,
+         polity != -77)
+
+coup_polity$realized_coup <- as_factor(coup_polity$realized_coup)
+
+```
+
+
+```{r}
+
+x <- glm(realized_coup ~ mort_rate + level_infl + control, family = binomial, data = coup_polity) %>% 
+  ggPredict()
+
+
+
+  
 ```
 
