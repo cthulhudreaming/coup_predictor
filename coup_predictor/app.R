@@ -184,9 +184,9 @@ ui <- fluidPage(navbarPage("Urgent Fury: Will your coup succeed?",
                  href = "https://www.cia.gov/library/publications/the-world-factbook/fields/299.html"))
              ))
     
-# Navbar and fluid page end
 
-))
+
+)) # End of Navbar and Fluidpage
 
     
 server <- function(input, output, session) {
@@ -207,19 +207,15 @@ server <- function(input, output, session) {
             
             pred <- predict(logistic_fit, new_data = temp, type = "prob")
             output$logis <- renderTable({pred})
-        }
-                     
             
-        )
+            }) # End of observeEvent
         
             
         
-    }
-        
-    )
+    }) # End of observe
 
     
-}
+} # End of server
 
 
 shinyApp(ui = ui, server = server)
