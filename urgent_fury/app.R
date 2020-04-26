@@ -28,6 +28,74 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                 
     theme = shinytheme("yeti"),
     
+    tabPanel("About",
+             mainPanel(
+               h4("Background"),
+               p("The goal of this project was to determine what factors 
+                 determine the success of a coup d'etat. In addition, I wanted 
+                 to see if autocratic countries were more vulnerable to 
+                 coups d'etat than democratic countries, or vice-versa."),
+               p("I got the idea for the first part of this project while 
+                 reading Edward N. Luttwak's infamous book 
+                 'Coup d'Etat: A Practical Handbook', which inspired various 
+                 countries to 'coup proof' their governments after it was first 
+                 released in 1968. In the second chapter, Luttwak argues that 
+                 there are three criteria that determine the success of a coup :
+                 econmic backwardness, a lack of foreign influence, and a 
+                 highly centralized government"),
+               p("According to Luttwak, in order for a coup to succeed, a 
+                 country must not be economically developed. In 
+                 'economically backwards' countries, political participation is 
+                 reserved for the elite, and the people are ignorant of politics.
+                 He posited a few measures of 'economic backwardness' such as 
+                 high birth and death rates."),
+               p("In addition, Luttwak stated that a country must be free of 
+                 foreign influence in order for a coup to be successful. 
+                 He argued that if a foreign power has a large military or 
+                 political presence in the country, one must obtain the foreign 
+                 power's permission before attempting a coup, or else it would fail."),
+               p("Lastly, Luttwak wrote that a country needs to have a highly \
+                 centralized government in order to a coup to succeed, as there 
+                 would only be one center of power to capture."),
+               p("I got the idea for the second part of this project from 
+                 my fall freshman seminar, 'The Political Significance of 
+                 Espionage and Subversion'. A central question of the class was
+                 whether or not 'autocracies' or 'democracies' are more 
+                 vulnerable to political subversion. Since coups are arguably 
+                 the ultimate form of political subversion, I wanted to see 
+                 if coups were more common in 'autocracies' or 'democracies'."),
+               h4("About Me"),
+               p("My name is Nidal and I a member of Harvard College's class 
+                   of 2023. This is my final project for GOV1005: Data. I hope
+                   to concentrate in History with a Secondary in Government"))),
+    
+    tabPanel("Instructions",
+             mainPanel(
+               h3("Your goal is to find out if your coup d'etat will succed in
+                  your target country"),
+               h4("Step 1: Set level of economic underdevelopment"),
+               h5("Level of economic development determined by infant mortality,
+                  birth, and death rates. Higher infant mortality, birth, and 
+                  death rates is associated with an overall lack of economic 
+                  development"),
+               h4("Step 2: Set level of political independence"),
+               h5("Level of political independence is determined by the amount of
+               foreign influence. A higher number of US military bases or outposts
+              corresponds to more foreign influence, and thus a lower level of
+              political independence."),
+               h4("Step 3: Determine level of government centralization"),
+               h5("Level of government centralization determined by regime type. 
+                  Absolute monarchies, Communist states, and one-party states are
+                  highly centralized. Parliamentary republics, semi-presidential states,
+                  and constitutional monarchies are somewhat centralized. Presidential 
+                  republics and federal states are not very centralized."),
+               h6("Note: Authoritarian states known as 'presidential republics' 
+                  are still classified as 'not very centralized' given how some
+                  deliberately spread power across the government to prevent coup
+                  attempts and how there are usually other factors that prevent 
+                  the complete centralization of power such as the presence of 
+                  influential state-owned enterprises and powerful paramilitary
+                  groups."))),
     tabPanel("Model",
              h5("Create your own country with these indicators:"),
              sidebarLayout(
@@ -38,12 +106,12 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                                  max = 60, min = 9, value = 20),
                      sliderInput("deaths", "Set number of deaths per 1000 people",
                                  max = 40, min = 2, value = 15),
-                     numericInput("bases", "Select amount of foreign influence",
+                     numericInput("bases", "Select level of political independence",
                                   max = 4, min = 1, value = 2),
-                     h6("1 = a large amount of foreign influence"), 
-                     h6("2 = a moderate amount of foreign influence"),
-                     h6("3 = some foreign influence"),
-                     h6("4 = very little foreign influence"),
+                     h6("1 = Not very politically independent; under heavy foreign influence"), 
+                     h6("2 = Moderately independent; under a moderate amount of foreign influence"),
+                     h6("3 = Somewhat independent; under some foreign influence"),
+                     h6("4 = Politically independent; foreign influence negligible"),
                      numericInput("gov", "How centralized is the government?",
                                   max = 3, min = 1, value = 2),
                      h6("1 = Not very centralized; e.g. federal presidential republicss"),
@@ -53,46 +121,6 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                  mainPanel(
                      tabsetPanel(
                          tabPanel("Model", tableOutput("logis")))))),
-    tabPanel("About",
-             mainPanel(
-                 h4("Background"),
-                 p("The goal of this project was to determine what factors 
-                 determine the success of a coup d'etat. In addition, I wanted 
-                 to see if autocratic countries were more vulnerable to 
-                 coups d'etat than democratic countries, or vice-versa."),
-                 p("I got the idea for the first part of this project while 
-                 reading Edward N. Luttwak's infamous book 
-                 'Coup d'Etat: a practical handbook, which inspired various 
-                 countries to 'coup proof' their governments after it was first 
-                 released in 1968. In the second chapter, Luttwak argues that 
-                 there are three criteria that determine the success of a coup 
-                   in a country: econmic backwardness, a lack of foreign 
-                   influence, and a highly centralized government"),
-                 p("According to Luttwak, in order for a coup to succeed, a 
-                 country must not be economically developed. In 
-                 'economically backwards' countries, political participation is 
-                 reserved for the elite, and the people are ignorant of politics.
-                 He posited a few measures of 'economic backwardness' such as 
-                 high birth and death rates."),
-                 p("In addition, Luttwak stated that a country must be free of 
-                 foreign influence in order for a coup to be successful. 
-                 He argued that if a foreign power has a large military or 
-                 political presence in the country, one must obtain the foreign 
-                 power's permission before attempting a coup, or else it would fail."),
-                 p("Lastly, Luttwak wrote that a country needs to have a highly \
-                 centralized government in order to a coup to succeed, as there 
-                 would only be one center of power to capture."),
-                 p("I got the idea for the second part of this project from 
-                 my fall freshman seminar, 'The Political Significance of 
-                 Espionage and Subversion. A central question of the class was
-                 whether or not 'autocracies' or 'democracies' are more 
-                 vulnerable to political subversion. Since coups are arguably 
-                 the ultimate form of political subversion, I wanted to see 
-                 if coups were more common in 'autocracies' or 'democracies'."),
-                 h4("About Me"),
-                 p("My name is Nidal and I a member of Harvard College's class 
-                   of 2023. This is my final project for GOV1005: Data. I hope
-                   to concentrate in History with a Secondary in Government"))),
     tabPanel("The data",
              mainPanel(
                  h4("Methods"),
@@ -101,20 +129,21 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                    of 'economic backwardess', such as high infant mortality, 
                    birth and overall death rates from the World Bank"),
                  p("Because such indicators vary by year, I decided to only look
-                   at observations from the year 1991. The choice of year is
-                   arbitrary. Futher, I cleaned this data by pivoting the 
-                   datasets to a longer format and removing unnessary rows, such
-                   as data for regions rather than countries"),
+                   at observations from the year 1991. I chose that year as that
+                   was when more and more countries started to collect this data,
+                   Futher, I cleaned this data by pivoting the datasets to a 
+                   longer format and removing unnessary rows, such as data for 
+                   regions rather than countries"),
                  p("To measure the amount of 'foreign influence' in a country,
                    I used a dataset of US military bases abroad in 1989. Since I
                    need my data to be somewhat consistent, I decided to use data
                    from 1989, as I couldn't specifically find data from 1991. I 
                    then assigned a number from 1 to 4 to each country with a 
-                   US military presence. If a country had 1 to 10 US bases or 
-                   outposts, then it was assigned a 3. If a country had 10 to 50
-                   US bases of outposts, then it was assigned a 2. If a country
-                   had more than 50 US bases or outposts, then it was assigned 
-                   a 1. A country with no US military presence was given a 4. 
+                   US military presence. A country with no US military presence 
+                   was given a 4. If a country had 1 to 10 US bases or outposts, 
+                   then it was assigned a 3. If a country had 10 to 50 US bases 
+                   or outposts, then it was assigned a 2. If a country had more 
+                   than 50 US bases or outposts, then it was assigned a 1. 
                    Thus, a 1 represents the most amount of 'foreign influence' 
                    while a 4 represents the least. I wanted to include data on
                    Chinese, French, and Russian military presence abroad, but I
@@ -122,15 +151,15 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                  p("To measure how 'centralized' a country's government is, I
                    scraped a table from the CIA World Factbook that lists each
                    country's system of government. I then assigned each country
-                   a number from 1 to 3 where 1 is the most centralized and 3 is
-                   the most decentralized. Examples of regimes that would be 
-                   classified as a 1 would be absolute monarchies or Communist 
+                   a number from 1 to 3 where 1 is the most decentralized and 3 is
+                   the most centralized. Examples of regimes that would be 
+                   classified as a 3 would be absolute monarchies or Communist 
                    states. Countries with parliamentry systems are classified as 
                    a 2, as in a parliamentary system, the powers of the 
                    executive and legislative branches are fused, thus making
                    the government more centralized. Finally, countries with
-                   presidential systems or federal countries are were given a 
-                   3, as in a presidential system there is usually a separation
+                   presidential systems and/or federal countries are were given a 
+                   1, as in a presidential system there is usually a separation
                    of powers, and in a federal state, the power of the central
                    government is typically weak. Although some authoritarian 
                    states, such as Syria, have 'presidential' systems, I 
@@ -157,16 +186,11 @@ ui <- fluidPage(navbarPage("Urgent Fury",
     tabPanel("Coups and regime type",
              mainPanel(
                  h4("Explore the relationship between government centralization, 
-                    regime type, and coup success")
-             )
-             )
+                    regime type, and coup success")))
     
-    
-)
+# Navbar and fluid page end
 
-
-    
-)
+))
 
     
 server <- function(input, output, session) {
@@ -183,14 +207,9 @@ server <- function(input, output, session) {
         temp <- cbind(mort_rate, birth_rate, death_rate, level_infl, gov)
         temp <- as_data_frame(temp)
         
-        temp$realized_coup <- ""
-        
-      
-        
         observeEvent(input$run_model_log, {
             
-        
-            pred <- predict(logistic_fit, new_data = temp)
+            pred <- predict(logistic_fit, new_data = temp, type = "prob")
             output$logis <- renderTable({pred})
         }
                      

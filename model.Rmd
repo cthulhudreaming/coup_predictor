@@ -43,19 +43,16 @@ forest_mod <- rand_forest(mtry = 7, trees = 50) %>%
 logistic_fit <- fit(logistic_mod,
                     realized_coup ~ mort_rate + birth_rate + death_rate + 
                     level_infl + gov,
+                    family = binomial,
                     data = coup_country)
 
-save(logistic_fit, file = "urgent_fury/logistic_mod.rda")
+
 
 logistic_fit$fit %>% 
   tidy(conf.int = T) %>% 
-  select(term, estimate, conf.low, conf.high)
+  select(term, estimate)
 
 
-forest_fit <- fit(forest_mod,
-                  realized_coup ~ mort_rate + birth_rate + death_rate + 
-                    level_infl + gov,
-                  data = coup_country)
 
 
 ```
@@ -69,8 +66,8 @@ country_a <- tibble(
   death_rate = 22,
   gov = '1')
 
-x <- predict(logistic_fit, new_data = country_a)
-y <- predict(forest_fit, new_data = country_a)
+x <- predict(logistic_fit, new_data = country_a, type = "prob")
+
 
 
 ```
