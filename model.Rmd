@@ -14,14 +14,14 @@ library(tidyverse)
 library(tidymodels)
 library(rpart.plot)
 
-load("data/coup_data.rds")
+load("clean-data/coup_data.rds")
 
 coup_country <- coup_country %>% 
 rename(gov = control)
 coup_country$realized_coup <- as_factor(coup_country$realized_coup)
 coup_country$level_infl <- as.character(coup_country$level_infl)
 
-save(coup_country, file = "urgent_fury/coup_data_final.rds")
+save(coup_country, file = "coup_predictor/coup_data_final.rds")
 
 ```
 
@@ -38,22 +38,11 @@ forest_mod <- rand_forest(mtry = 7, trees = 50) %>%
 
 ```{r}
 
-
-
 logistic_fit <- fit(logistic_mod,
                     realized_coup ~ mort_rate + birth_rate + death_rate + 
                     level_infl + gov,
                     family = binomial,
                     data = coup_country)
-
-
-
-logistic_fit$fit %>% 
-  tidy(conf.int = T) %>% 
-  select(term, estimate)
-
-
-
 
 ```
 
@@ -67,7 +56,6 @@ country_a <- tibble(
   gov = '1')
 
 x <- predict(logistic_fit, new_data = country_a, type = "prob")
-
 
 
 ```
