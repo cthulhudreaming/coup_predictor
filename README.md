@@ -8,4 +8,6 @@ likelihood of a successful coup d'etat in a country./
 
 # Repository guide
 
+/coup_predictor
+
 
