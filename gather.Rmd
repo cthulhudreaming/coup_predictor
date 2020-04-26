@@ -14,58 +14,46 @@ library(rvest)
 ```
 
 
-```{r codes}
-
-# This is a list of codes that are assigned to each country. I plan to join
-# this dataset with my military base dataset so I can then easily join the 
-# joined dataset with my other ones.
-
-codes <- read_csv("raw-data/COW.csv") %>% 
-  clean_names() %>% 
-  select(c_code, state_nme)
-
-```
-
-
 ```{r coups}
+
+# Reading in coup data.
 
 coups <- read_excel("raw-data/Coupdata.xls") %>% 
   clean_names()
 
+# Selecting relevant columns.
+
 coups_clean <- coups %>% 
   select(cow_code, country_where_action_occurred, year_of_event, month_of_event, day_of_event, type_of_coup, realized_coup, unrealized, military_coup, rebel_coup, palace_coup)
+
+# Filtering to year 1991. Since the data I will read in later varies by year,
+# I decided to keep the year constant across all my datasets. I chose the year
+# 1991 because that is when more and more countries started reporting data
+# to the World Bank.
 
 coups <- coups_clean %>% 
   filter(year_of_event == 1991) %>% 
   select(cow_code, country_where_action_occurred, realized_coup)
 
-coups_regime <- coups_clean %>% 
-  select(cow_code, country_where_action_occurred, year_of_event, realized_coup)
 
 ```
 
-
-```{r polity}
-
-polity_raw <- read_excel("raw-data/polity_iv.xls") %>% 
-  clean_names() 
-
-polity <- polity_raw %>% 
-  filter(year == 1991) %>% 
-  select(ccode, country, polity)
-
-polity_regime <- polity_raw %>% 
-  select(ccode, country, year, polity)
-
-```
 
 ```{r bases}
+
+# Reading in US military base data. I filtered to the year 1989 since I could
+# not find data for the year 1991, and 1989 is close enough in time to 1991, so
+# there would presumably not be much variation.
 
 bases <- read_excel("raw-data/basesabroad.xlsx", sheet = "1989", skip = 13) %>% 
   clean_names() %>% 
   rename("base_name" = x2) 
 
+# Converting the country names to lowercase.
+
 bases$country_name <- tolower(bases$country_name)
+
+# Counting the number of US bases by country.
 
 yes_bases <- bases %>% 
   select(country_name, base_name) %>% 
@@ -90,10 +78,15 @@ bases_clean <- read_csv("raw-data/clean_bases.csv") %>%
 
 ```{r infant}
 
+# Reading in infant mortality data and removing irrelevant columns.
+
 infant <- read_excel("raw-data/infant_mort.xls", 
                        skip = 2) %>% 
   clean_names() %>% 
   select(-indicator_name, -indicator_code)
+
+# Tidying this dataset by converting it to a 'longer' format so it's easier
+# to read. I then remove the "x" prefix from the year observations.
 
 infant <- infant %>% 
   pivot_longer(
@@ -102,8 +95,13 @@ infant <- infant %>%
     values_to = "infant_mortality_rate",
     names_prefix = "x")
 
+# Filtering to year 1991 so the year is kept constant across my datasets.
+
 infant_clean <- infant %>% 
   filter(year == 1991)
+
+# Calculating the infant mortality rate percentage by dividing the raw number
+# by 1000 and multiplying by 100.
 
 infant_clean <- infant_clean %>% 
   mutate(mort_rate = infant_mortality_rate/1000 * 100) %>% 
@@ -117,10 +115,14 @@ infant_clean <- infant_clean %>%
 
 ```{r births}
 
+# Reading in birth rate data and removing irrelevant columns.
+
 births <- read_excel("raw-data/births.xls", 
                      skip = 2) %>% 
   clean_names() %>% 
   select(-indicator_name, -indicator_code)
+
+# Pivoting births dataset to make it easier to read.
 
 births <- births %>% 
   pivot_longer(
@@ -128,6 +130,8 @@ births <- births %>%
     names_to = "year",
     values_to = "birth_rate",
     names_prefix = "x")
+
+# Filtering to 1991 so the year is constant across all of my datasets.
 
 clean_births <- births %>% 
   filter(year == 1991) %>% 
@@ -139,11 +143,14 @@ clean_births <- births %>%
 
 ```{r deaths}
 
+# Reading in death rate data and removing irrelevant columns.
 
 deaths <- read_excel("raw-data/deaths.xls",
                      skip = 2) %>% 
   clean_names() %>% 
   select(-indicator_name, -indicator_code)
+
+# Tidying the death rate data to make it easier to read.
 
 deaths <- deaths %>% 
   pivot_longer(
@@ -151,6 +158,8 @@ deaths <- deaths %>%
     names_to = "year",
    values_to = "death_rate",
    names_prefix = "x")
+
+# Filtering to year 1991 so the year is kept constant across all of my datasets.
 
 clean_deaths <- deaths %>% 
   filter(year == 1991) %>% 
@@ -162,15 +171,34 @@ clean_deaths <- deaths %>%
 
 ```{r join}
 
-join1 <- full_join(infant_clean, clean_births, by = c("country_name" = "country_name",
-                                                      "country_code" = "country_code"))
+# Joining infant mortality data with birth rate data by country name and 
+# country code and saving the new dataset as 'join1'.
 
-dev_indc <- full_join(join1, clean_deaths, by = c("country_name" = "country_name",
-                                                  "country_code" = "country_code"))
+join1 <- full_join(infant_clean, 
+                   clean_births, 
+                   by = c("country_name" = "country_name",
+                                        "country_code" = "country_code"))
 
-bases_dev <- full_join(dev_indc, bases_clean, by = c("country_name" = "country_name"))
+# Joining 'join1' dataset with death rate data by country name and country
+# code and saving the new dataset as 'dev_indc'.
+
+dev_indc <- full_join(join1, 
+                      clean_deaths, 
+                      by = c("country_name" = "country_name",
+                                           "country_code" = "country_code"))
+
+# Joining the 'dev_indc' dataset with military base dataset by country name.
+
+bases_dev <- full_join(dev_indc, 
+                       bases_clean, 
+                       by = c("country_name" = "country_name"))
+
+# Changing the NA for countries with no US military bases to 0.
 
 bases_dev$n[is.na(bases_dev$n)] <- 0
+
+# Creating a new column that assigns a numerical value from 1 to 4 to each 
+# country depending on the number of US military bases present.
 
 full_clean <- bases_dev %>% 
   mutate(level_infl = case_when(n %in% 1:10 ~ '3',
@@ -185,17 +213,32 @@ full_clean <- bases_dev %>%
 
 ```{r gov_type}
 
+# Saving the target url.
+
 url <- "https://www.cia.gov/library/publications/the-world-factbook/fields/299.html"
+
+# Scraping table of countries and government systems from the url.
 
 countries <- url %>% 
   read_html() %>% 
   html_nodes(xpath = '//*[@id="fieldListing"]') %>% 
   html_table()
 
+# Saving the scraped table as a dataframe.
+
 countries <- data.frame(countries)
+
+# Making the column names easier to work with.
 
 countries <- countries %>% 
   clean_names()
+
+# Assigning each country a value from 1 to 3 depending on its system of 
+# government. A country with an absolute monarchy, for example, is a 3, 
+# meaning its government is highly centralized. A country with a parliamentary
+# system , for example, is a 2, meaning it's somewhat centralized. A country 
+# with a presidential system, for example, is a 1 meaning it s not very 
+# centralized.
 
 clean_countries <- countries %>% 
   mutate(control = case_when(
@@ -218,8 +261,15 @@ clean_countries <- countries %>%
 
 ```{r final_join}
 
-coups_dev <- full_join(full_clean, coups, by = c("country_name" = "country_where_action_occurred")) %>% 
+# Joining my previously joined datasets with my countries dataset and selecting
+# the relevant columns.
+
+coups_dev <- full_join(full_clean, 
+                       coups, 
+                       by = c("country_name" = "country_where_action_occurred")) %>% 
   select(country_name, mort_rate, birth_rate, death_rate, level_infl, realized_coup)
+
+# Changing NA values for countries with no attempted coups to 0.
 
 coups_dev$realized_coup[is.na(coups_dev$realized_coup)] <- 0
 
@@ -227,15 +277,19 @@ coups_dev$realized_coup[is.na(coups_dev$realized_coup)] <- 0
 
 ```{r}
 
-# I realized that the above dataset was not completely clean. Some rows didn't
-# contain observations for individual countries, but whole regions or income
-# groups. I decided to write the data to a csv file to clean it manually. Here
-# I am reading in that csv file.
+# I realized that the full_clean dataset was not completely clean. Some rows 
+# didn't contain observations for individual countries, but whole regions or 
+# income groups. I decided to write the data to a csv file to clean it manually. 
+# Here I am reading in that csv file.
 
 clean_coups_dev <- read_csv("raw-data/clean2.csv") %>% 
   select(-X1)
 
-coup_country <- full_join(clean_coups_dev, clean_countries, 
+# Re-joining the countries dataset with a cleaner version of the 'full_clean"
+# dataset and filtering out NA values.
+
+coup_country <- full_join(clean_coups_dev, 
+                          clean_countries, 
                   by = c("country_name" = "country")) %>% 
   select(-government_type) %>% 
   filter(!is.na(mort_rate)) %>% 
@@ -245,42 +299,9 @@ coup_country <- full_join(clean_coups_dev, clean_countries,
   filter(!is.na(realized_coup)) %>% 
   filter(!is.na(control))
 
+# Saving my completed dataset.
+
 save(coup_country, file = "data/coup_data.rds")
-
-```
-
-```{r}
-
-regime_coups <- full_join(coups_regime, polity_regime, 
-                         by = c("cow_code" = "ccode",
-                                "country_where_action_occurred" = "country",
-                                "year_of_event" = "year"))
-regime_coups <- regime_coups %>% 
-  filter(polity != -88) %>% 
-  filter(polity != -77) %>% 
-  filter(polity != -66)
-
-not_clean_countries <- countries %>% 
-  mutate(control = case_when(
-    str_detect(government_type, "absolute monarchy") ~ '3',
-    str_detect(government_type, "communist") ~ '3',
-    str_detect(government_type, "semi-presidential") ~ '2',
-    str_detect(government_type, "federal parliamentary") ~ '1',
-    str_detect(government_type, "federal republic") ~ '1',
-    str_detect(government_type, "federation") ~ '1',
-    str_detect(government_type, "presidential") ~ '1',
-    str_detect(government_type, "parliamentary republic") ~ '2',
-    str_detect(government_type, "constitutional monarchy") ~ '2',
-    str_detect(government_type, "parliamentary democracy") ~ '2',
-    str_detect(government_type, "theocratic republic") ~ '2')) %>% 
-  filter(!is.na(control))
-
-regime_full <- full_join(regime_coups, not_clean_countries, 
-                         by = c("country_where_action_occurred" = "country")) %>% 
-  filter(!is.na(realized_coup)) %>% 
-  filter(!is.na(polity))
-
-save(regime_full, file = "data/regime_coup.rds")
 
 ```
 

@@ -24,11 +24,11 @@ logistic_fit <- fit(logistic_mod,
 
 
 
-ui <- fluidPage(navbarPage("Urgent Fury",
+ui <- fluidPage(navbarPage("Urgent Fury: Will your coup succeed?",
                 
     theme = shinytheme("yeti"),
     
-    tabPanel("About",
+    tabPanel("Important contextual information",
              mainPanel(
                h4("Background"),
                p("The goal of this project was to determine what factors 
@@ -96,7 +96,7 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                   the complete centralization of power such as the presence of 
                   influential state-owned enterprises and powerful paramilitary
                   groups."))),
-    tabPanel("Model",
+    tabPanel("Coup Success Predictor",
              h5("Create your own country with these indicators:"),
              sidebarLayout(
                  sidebarPanel(
@@ -117,11 +117,11 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                      h6("1 = Not very centralized; e.g. federal presidential republicss"),
                      h6("2 = Somewhat centralized; e.g. parliamentray republics"),
                      h6("3 = Very centralized; e.g. absolute monarchies"),
-                     actionButton("run_model_log", "Run Logistic Model")),
+                     actionButton("run_model_log", "Run Model")),
                  mainPanel(
                      tabsetPanel(
-                         tabPanel("Model", tableOutput("logis")))))),
-    tabPanel("The data",
+                         tabPanel("Model result", tableOutput("logis")))))),
+    tabPanel("Data",
              mainPanel(
                  h4("Methods"),
                  p("For this project, I had to essentially quantify Luttwak's
@@ -182,11 +182,7 @@ ui <- fluidPage(navbarPage("Urgent Fury",
                   https://doi.org/10.17606/vfyb-nc07"),
                 p("I obtained the regime type data from the", a("CIA World Factbook",
                  href = "https://www.cia.gov/library/publications/the-world-factbook/fields/299.html"))
-             )),
-    tabPanel("Coups and regime type",
-             mainPanel(
-                 h4("Explore the relationship between government centralization, 
-                    regime type, and coup success")))
+             ))
     
 # Navbar and fluid page end
 
