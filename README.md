@@ -8,6 +8,12 @@ likelihood of a successful coup d'etat in a country./
 
 # Repository guide
 
-/coup_predictor
-
+README.md
+/coup_predictor: Shiny App
+.gitignore
+/clean-data
+/raw-data
+model.Rmd: code used to predict likelihood of coup success
+gather.Rmd: code used to clean, tidy, and join data
+About.Rmd: initial draft of 'about' page
 
