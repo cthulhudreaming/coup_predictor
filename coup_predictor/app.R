@@ -112,7 +112,7 @@ ui <- fluidPage(
                      actionButton("run_model_log", "Run Model")),
                  mainPanel(
                      tabsetPanel(
-                         tabPanel("Model result", tableOutput("logis")))))),
+                         tabPanel("Predicted coup outcomes", tableOutput("logis")))))),
     
     # This tab contains information about my data cleaning process and a list
     # of my data sources.

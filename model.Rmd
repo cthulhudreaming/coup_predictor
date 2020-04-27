@@ -14,12 +14,24 @@ library(tidyverse)
 library(tidymodels)
 library(rpart.plot)
 
+# Loading in completed dataset.
+
 load("clean-data/coup_data.rds")
+
+# Renaming one column.
 
 coup_country <- coup_country %>% 
 rename(gov = control)
+
+# Converting realized_coup to a factor.
+
 coup_country$realized_coup <- as_factor(coup_country$realized_coup)
+
+# Converting level_infl to a character column.
+
 coup_country$level_infl <- as.character(coup_country$level_infl)
+
+# Saving updated dataset to shiny app file.
 
 save(coup_country, file = "coup_predictor/coup_data_final.rds")
 
@@ -27,16 +39,16 @@ save(coup_country, file = "coup_predictor/coup_data_final.rds")
 
 ```{r models}
 
+# Creating logistic model.
+
 logistic_mod <- logistic_reg() %>% 
   set_engine("glm")
-
-forest_mod <- rand_forest(mtry = 7, trees = 50) %>% 
-  set_engine("randomForest") %>% 
-  set_mode("classification")
 
 ```
 
 ```{r}
+
+# Fitting coup data to logistic model.
 
 logistic_fit <- fit(logistic_mod,
                     realized_coup ~ mort_rate + birth_rate + death_rate + 
@@ -48,12 +60,17 @@ logistic_fit <- fit(logistic_mod,
 
 ```{r test}
 
+# Creating test country with arbitrary values in order to predict its coup
+# success/failure probabilities.
+
 country_a <- tibble(
   mort_rate = 25,
   birth_rate = 49,
   level_infl = '3',
   death_rate = 22,
   gov = '1')
+
+# Saving prediction result with probabilities.
 
 x <- predict(logistic_fit, new_data = country_a, type = "prob")
 
