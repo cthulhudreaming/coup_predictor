@@ -1,4 +1,5 @@
 
+# Loading required packages.
 
 library(shiny)
 library(tidyverse)
@@ -6,89 +7,75 @@ library(shinythemes)
 library(tidymodels)
 library(rstanarm)
 library(Rcpp)
+library(gt)
+library(scales)
 
+# Loading in completed dataset.
 
 load("coup_data_final.rds")
 
+# Converting the 'level_infl' column to a numeric column.
+
 coup_country$level_infl <- as.numeric(coup_country$level_infl)
 
+# Converting the 'gov' column to a numeric column.
+
 coup_country$gov <- as.numeric(coup_country$gov)
+
+# Creating logistic model.
 
 logistic_mod <- logistic_reg() %>% 
     set_engine("glm")
 
+# Fitting the logistic model with the loaded data.
+
 logistic_fit <- fit(logistic_mod,
                     realized_coup ~ mort_rate + birth_rate + death_rate + 
-                        level_infl + gov,
+                    level_infl + gov,
                     data = coup_country)
 
 
+# Start of Shiny App user interface.
 
-ui <- fluidPage(navbarPage("Urgent Fury: Will your coup succeed?",
-                
+ui <- fluidPage(
+    
+    # App title
+    
+    navbarPage("Urgent Fury: Will your coup succeed?",
+    
     theme = shinytheme("yeti"),
     
-    tabPanel("Important contextual information",
-             mainPanel(
-               h4("Background"),
-               p("The goal of this project was to determine what factors 
-                 determine the success of a coup d'etat. In addition, I wanted 
-                 to see if autocratic countries were more vulnerable to 
-                 coups d'etat than democratic countries, or vice-versa."),
-               p("I got the idea for the first part of this project while 
-                 reading Edward N. Luttwak's infamous book 
-                 'Coup d'Etat: A Practical Handbook', which inspired various 
-                 countries to 'coup proof' their governments after it was first 
-                 released in 1968. In the second chapter, Luttwak argues that 
-                 there are three criteria that determine the success of a coup :
-                 econmic backwardness, a lack of foreign influence, and a 
-                 highly centralized government"),
-               p("According to Luttwak, in order for a coup to succeed, a 
-                 country must not be economically developed. In 
-                 'economically backwards' countries, political participation is 
-                 reserved for the elite, and the people are ignorant of politics.
-                 He posited a few measures of 'economic backwardness' such as 
-                 high birth and death rates."),
-               p("In addition, Luttwak stated that a country must be free of 
-                 foreign influence in order for a coup to be successful. 
-                 He argued that if a foreign power has a large military or 
-                 political presence in the country, one must obtain the foreign 
-                 power's permission before attempting a coup, or else it would fail."),
-               p("Lastly, Luttwak wrote that a country needs to have a highly \
-                 centralized government in order to a coup to succeed, as there 
-                 would only be one center of power to capture."),
-               p("I got the idea for the second part of this project from 
-                 my fall freshman seminar, 'The Political Significance of 
-                 Espionage and Subversion'. A central question of the class was
-                 whether or not 'autocracies' or 'democracies' are more 
-                 vulnerable to political subversion. Since coups are arguably 
-                 the ultimate form of political subversion, I wanted to see 
-                 if coups were more common in 'autocracies' or 'democracies'."),
-               h4("About Me"),
-               p("My name is Nidal and I a member of Harvard College's class 
-                   of 2023. This is my final project for GOV1005: Data. I hope
-                   to concentrate in History with a Secondary in Government"))),
+    # My first tab is an instructions tab so users know how to use the model.
     
     tabPanel("Instructions",
              mainPanel(
-               h3("Your goal is to find out if your coup d'etat will succed in
-                  your target country"),
+               h3("How to use this model"),
+               br(),
+               h4("You've been tasked with planning a coup d'etat, and you want to 
+                  determine the likelihood that this coup will succeed"),
+               br(),
                h4("Step 1: Set level of economic underdevelopment"),
-               h5("Level of economic development determined by infant mortality,
+               br(),
+               h5("The level of economic development is determined by infant mortality,
                   birth, and death rates. Higher infant mortality, birth, and 
                   death rates is associated with an overall lack of economic 
                   development"),
+               br(),
                h4("Step 2: Set level of political independence"),
-               h5("Level of political independence is determined by the amount of
+               br(),
+               h5("The level of political independence is determined by the amount of
                foreign influence. A higher number of US military bases or outposts
               corresponds to more foreign influence, and thus a lower level of
               political independence."),
+               br(),
                h4("Step 3: Determine level of government centralization"),
-               h5("Level of government centralization determined by regime type. 
+               br(),
+               h5("The level of government centralization is determined by regime type. 
                   Absolute monarchies, Communist states, and one-party states are
                   highly centralized. Parliamentary republics, semi-presidential states,
                   and constitutional monarchies are somewhat centralized. Presidential 
                   republics and federal states are not very centralized."),
+               br(),
                h6("Note: Authoritarian states known as 'presidential republics' 
                   are still classified as 'not very centralized' given how some
                   deliberately spread power across the government to prevent coup
@@ -96,6 +83,11 @@ ui <- fluidPage(navbarPage("Urgent Fury: Will your coup succeed?",
                   the complete centralization of power such as the presence of 
                   influential state-owned enterprises and powerful paramilitary
                   groups."))),
+    
+    # This tab contains the actual model, where users select the value of 
+    # various indicators, and then see the probability of a coup succeeding in
+    # a country with those values.
+    
     tabPanel("Coup Success Predictor",
              h5("Create your own country with these indicators:"),
              sidebarLayout(
@@ -121,6 +113,10 @@ ui <- fluidPage(navbarPage("Urgent Fury: Will your coup succeed?",
                  mainPanel(
                      tabsetPanel(
                          tabPanel("Model result", tableOutput("logis")))))),
+    
+    # This tab contains information about my data cleaning process and a list
+    # of my data sources.
+    
     tabPanel("Data",
              mainPanel(
                  h4("Methods"),
@@ -176,23 +172,67 @@ ui <- fluidPage(navbarPage("Urgent Fury: Will your coup succeed?",
                    a("World Bank", href = "https://data.worldbank.org/indicator/SP.DYN.CBRT.IN")),
                 p("I obtained the death rate (per 1000 peole ) from the", a("World Bank",
                 href = "https://data.worldbank.org/indicator/SP.DYN.CBRT.IN")),
-                p("I obtained the US military base data from David Vine, 
-                'Lists of U.S. Military Bases Abroad, 1776-2019,
-                  'American University Digital Research Archive, 2019, 
-                  https://doi.org/10.17606/vfyb-nc07"),
-                p("I obtained the regime type data from the", a("CIA World Factbook",
-                 href = "https://www.cia.gov/library/publications/the-world-factbook/fields/299.html"))
-             ))
+                p("I obtained the US military base data from", 
+                  a("here", href = "https://doi.org/10.17606/vfyb-nc07")),
+                p("I obtained the regime type data from the", 
+                  a("CIA World Factbook",
+                 href = "https://www.cia.gov/library/publications/the-world-factbook/fields/299.html")),
+                p("Here is a link to my", a("Github repo", 
+                    href = "https://github.com/cthulhudreaming/coup_predictor/")))),
     
-
-
-)) # End of Navbar and Fluidpage
-
+    # This tab contains background information about my project and information
+    # about me.
     
+    tabPanel("About",
+             mainPanel(
+                 h4("Background"),
+                 p("The goal of this project was to determine what factors 
+                 determine the success of a coup d'etat. In addition, I wanted 
+                 to see if autocratic countries were more vulnerable to 
+                 coups d'etat than democratic countries, or vice-versa."),
+                 p("I got the idea for the first part of this project while 
+                 reading Edward N. Luttwak's infamous book 
+                 'Coup d'Etat: A Practical Handbook', which inspired various 
+                 countries to 'coup proof' their governments after it was first 
+                 released in 1968. In the second chapter, Luttwak argues that 
+                 there are three criteria that determine the success of a coup :
+                 econmic backwardness, a lack of foreign influence, and a 
+                 highly centralized government"),
+                 p("According to Luttwak, in order for a coup to succeed, a 
+                 country must not be economically developed. In 
+                 'economically backwards' countries, political participation is 
+                 reserved for the elite, and the people are ignorant of politics.
+                 He posited a few measures of 'economic backwardness' such as 
+                 high birth and death rates."),
+                 p("In addition, Luttwak stated that a country must be free of 
+                 foreign influence in order for a coup to be successful. 
+                 He argued that if a foreign power has a large military or 
+                 political presence in the country, one must obtain the foreign 
+                 power's permission before attempting a coup, or else it would fail."),
+                 p("Lastly, Luttwak wrote that a country needs to have a highly \
+                 centralized government in order to a coup to succeed, as there 
+                 would only be one center of power to capture."),
+                 br(),
+                 h4("About Me"),
+                 p("My name is Nidal and I a member of Harvard College's class 
+                   of 2023. This is my final project for GOV1005: Data. I hope
+                   to concentrate in History with a Secondary in Government. You
+                 can contact me at nini00225 [at] protonmail.com")))
+
+# End of Navbar and FluidPage.
+
+)) 
+
 server <- function(input, output, session) {
     set.seed(1234)
     
+    # Creating an observer to react when the user pushes the "run model" 
+    # button.
+    
     observe({
+    
+        # Matching user input values to their corresponding labels as used 
+        # in the model.
         
         mort_rate <- as.numeric(input$infant)
         birth_rate <- as.numeric(input$births)
@@ -200,22 +240,49 @@ server <- function(input, output, session) {
         level_infl <- as.integer(input$bases)
         gov <- as.integer(input$gov)
         
+        # Binding those input values into a data frame.
+        
         temp <- cbind(mort_rate, birth_rate, death_rate, level_infl, gov)
         temp <- as_data_frame(temp)
         
+        # Here I am returning a reactive expression in response to a suer
+        # clicking the 'run model' button.
+        
         observeEvent(input$run_model_log, {
             
+            # Using the predict function to output the probability of a
+            # successful/failed coup using the newly created dataframe.
+            
             pred <- predict(logistic_fit, new_data = temp, type = "prob")
-            output$logis <- renderTable({pred})
             
-            }) # End of observeEvent
+            # Reformatting the values of the probabilites to percentages.
+            
+            pred$.pred_0 <- percent(pred$.pred_0, suffix = "%")
+            pred$.pred_1 <- percent(pred$.pred_1, suffix = "%")
+            
+            # Renaming the column names to more descriptive ones.
+            
+            pred_table <- pred %>% 
+                rename("Chance of failure" = .pred_0,
+                       "Chance of success" = .pred_1)
+            
+            # Rendering the above table as a reactive output, meaning it will
+            # change depending on the input values.
+            
+            output$logis <- renderTable({pred_table})
+            
+            # End of observeEvent.
+            
+            }) 
         
             
+    # End of observe.  
         
-    }) # End of observe
+    }) 
 
+# End of server.
     
-} # End of server
+} 
 
 
 shinyApp(ui = ui, server = server)
