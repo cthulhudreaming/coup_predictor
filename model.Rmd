@@ -1,9 +1,4 @@
----
-title: "Model"
-author: "Nidal"
-date: "4/23/2020"
-output: html_document
----
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,
@@ -34,6 +29,7 @@ coup_country$level_infl <- as.character(coup_country$level_infl)
 # Saving updated dataset to shiny app file.
 
 save(coup_country, file = "coup_predictor/coup_data_final.rds")
+
 
 ```
 

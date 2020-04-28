@@ -1,0 +1,95 @@
+---
+title: "machine_learning"
+author: "Nidal"
+date: "4/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+
+
+library(infer)
+library(tidyverse)
+library(tidymodels)
+library(rpart.plot)
+library(gt)
+
+load("clean-data/coup_data_final.rds")
+
+```
+
+
+```{r }
+
+coup_formulas <- tibble(formula = c(realized_coup ~ mort_rate + birth_rate + 
+                                      death_rate,
+                                    realized_coup ~ level_infl,
+                                    realized_coup ~ gov,
+                                    relized_coup ~ gov * level_infl,
+                                    realized_coup ~ gov + mort_rate * 
+                                      birth_rate * death_rate,
+                                    realized_coup ~ mort_rate + birth_rate + 
+                                      death_rate + level_infl + gov),
+                        group = c("Economic model",
+                                  "Political independence model",
+                                  "Government centralization model",
+                                  "Independence and centralization model",
+                                  "Government and economic model",
+                                  "Full model"))
+
+```
+
+
+
+```{r }
+
+set.seed(1234)
+
+coup_country_split <- initial_split(coup_country, prop = 0.8)
+coup_country_train <- training(coup_country_split)
+coup_country_test <- testing(coup_country_split)
+coup_country_folds <- coup_country_train %>% 
+  vfold_cv(v = 5)
+
+
+
+```
+
+
+```{r}
+
+logistic_mod <- logistic_reg() %>% 
+  set_engine("glm") %>% 
+  set_mode("classification")
+
+folds_metrics <- coup_formulas %>% 
+  mutate(metrics = map(formula, ~ fit_resamples(logistic_mod,
+                                               preprocessor = .,
+                                               resamples = coup_country_folds))) 
+
+
+folds_metrics_clean <- folds_metrics %>% 
+  select(group, metrics) %>% 
+  unnest(metrics)
+
+folds_metrics_cleaner <- folds_metrics_clean %>% 
+  select(group, .metrics) %>% 
+  unnest(.metrics) %>% 
+  filter(.metric == "accuracy") %>% 
+  select(group, .estimate) %>% 
+  group_by(group) %>% 
+  summarize(mean_acc = mean(.estimate))
+
+gt(folds_metrics_cleaner) %>% 
+  tab_header(title = "Average model performance") %>% 
+  cols_label(group = "Model type",
+             mean_acc = "Average accuracy rate")
+
+
+
+
+```
+
