@@ -301,7 +301,7 @@ coup_country <- full_join(clean_coups_dev,
 
 # Saving my completed dataset.
 
-save(coup_country, file = "data/coup_data.rds")
+save(coup_country, file = "clean-data/coup_data.rds")
 
 ```
 

@@ -14,6 +14,7 @@ library(scales)
 
 load("coup_data_final.rds")
 
+
 # Converting the 'level_infl' column to a numeric column.
 
 coup_country$level_infl <- as.numeric(coup_country$level_infl)
@@ -21,6 +22,7 @@ coup_country$level_infl <- as.numeric(coup_country$level_infl)
 # Converting the 'gov' column to a numeric column.
 
 coup_country$gov <- as.numeric(coup_country$gov)
+
 
 # Creating logistic model.
 
@@ -52,13 +54,13 @@ ui <- fluidPage(
                h3("How to use this model"),
                br(),
                h4("You've been tasked with planning a coup d'etat, and you want to 
-                  determine the likelihood that this coup will succeed"),
+                  determine the likelihood that this coup will succeed."),
                br(),
                h4("Step 1: Set level of economic underdevelopment"),
                br(),
                h5("The level of economic development is determined by infant mortality,
                   birth, and death rates. Higher infant mortality, birth, and 
-                  death rates is associated with an overall lack of economic 
+                  death rates are associated with an overall lack of economic 
                   development"),
                br(),
                h4("Step 2: Set level of political independence"),
@@ -106,14 +108,14 @@ ui <- fluidPage(
                      h6("4 = Politically independent; foreign influence negligible"),
                      numericInput("gov", "How centralized is the government?",
                                   max = 3, min = 1, value = 2),
-                     h6("1 = Not very centralized; e.g. federal presidential republicss"),
+                     h6("1 = Not very centralized; e.g. federal presidential republics"),
                      h6("2 = Somewhat centralized; e.g. parliamentray republics"),
                      h6("3 = Very centralized; e.g. absolute monarchies"),
                      actionButton("run_model_log", "Run Model")),
                  mainPanel(
-                     tabsetPanel(
+                     tabsetPanel(id = "tabs",
                          tabPanel("Predicted coup outcomes", tableOutput("logis")))))),
-    
+
     # This tab contains information about my data cleaning process and a list
     # of my data sources.
     
@@ -126,9 +128,9 @@ ui <- fluidPage(
                    birth and overall death rates from the World Bank"),
                  p("Because such indicators vary by year, I decided to only look
                    at observations from the year 1991. I chose that year as that
-                   was when more and more countries started to collect this data,
-                   Futher, I cleaned this data by pivoting the datasets to a 
-                   longer format and removing unnessary rows, such as data for 
+                   was when more and more countries started to collect this data.
+                   Further, I cleaned this data by pivoting the datasets to a 
+                   longer format and removing unnecessary rows, such as data for 
                    regions rather than countries"),
                  p("To measure the amount of 'foreign influence' in a country,
                    I used a dataset of US military bases abroad in 1989. Since I
@@ -154,7 +156,7 @@ ui <- fluidPage(
                    a 2, as in a parliamentary system, the powers of the 
                    executive and legislative branches are fused, thus making
                    the government more centralized. Finally, countries with
-                   presidential systems and/or federal countries are were given a 
+                   presidential systems and/or federal countries were given a 
                    1, as in a presidential system there is usually a separation
                    of powers, and in a federal state, the power of the central
                    government is typically weak. Although some authoritarian 
@@ -166,6 +168,8 @@ ui <- fluidPage(
                    there were other indicators of decentralization, such as
                    sectarianism or ethnic tensions."),
                  h4("Sources"),
+                 p("I obtained the coup dataset from the", a("Coup d'Etat Project", 
+                href = "https://clinecenter.illinois.edu/project/research-themes/democracy-and-development/coup-detat-project-cdp")),
                  p("I obtained the infant mortality data from the", a("World Bank",
                  href = "https://data.worldbank.org/indicator/SP.DYN.IMRT.IN)")),
                  p("I obtained the birth rate data (per 1000 people) from the", 
@@ -186,17 +190,15 @@ ui <- fluidPage(
     tabPanel("About",
              mainPanel(
                  h4("Background"),
-                 p("The goal of this project was to determine what factors 
-                 determine the success of a coup d'etat. In addition, I wanted 
-                 to see if autocratic countries were more vulnerable to 
-                 coups d'etat than democratic countries, or vice-versa."),
-                 p("I got the idea for the first part of this project while 
+                 p("The goal of this project is to determine what factors 
+                 determine the success of a coup d'etat."),
+                 p("I got the idea for this project while 
                  reading Edward N. Luttwak's infamous book 
                  'Coup d'Etat: A Practical Handbook', which inspired various 
                  countries to 'coup proof' their governments after it was first 
                  released in 1968. In the second chapter, Luttwak argues that 
                  there are three criteria that determine the success of a coup :
-                 econmic backwardness, a lack of foreign influence, and a 
+                 economic backwardness, a lack of foreign influence, and a 
                  highly centralized government"),
                  p("According to Luttwak, in order for a coup to succeed, a 
                  country must not be economically developed. In 
@@ -207,9 +209,9 @@ ui <- fluidPage(
                  p("In addition, Luttwak stated that a country must be free of 
                  foreign influence in order for a coup to be successful. 
                  He argued that if a foreign power has a large military or 
-                 political presence in the country, one must obtain the foreign 
+                 political presence in a country, one must obtain the foreign 
                  power's permission before attempting a coup, or else it would fail."),
-                 p("Lastly, Luttwak wrote that a country needs to have a highly \
+                 p("Lastly, Luttwak wrote that a country needs to have a highly 
                  centralized government in order to a coup to succeed, as there 
                  would only be one center of power to capture."),
                  br(),
@@ -245,7 +247,7 @@ server <- function(input, output, session) {
         temp <- cbind(mort_rate, birth_rate, death_rate, level_infl, gov)
         temp <- as_data_frame(temp)
         
-        # Here I am returning a reactive expression in response to a suer
+        # Here I am returning a reactive expression in response to a user
         # clicking the 'run model' button.
         
         observeEvent(input$run_model_log, {
@@ -255,7 +257,7 @@ server <- function(input, output, session) {
             
             pred <- predict(logistic_fit, new_data = temp, type = "prob")
             
-            # Reformatting the values of the probabilites to percentages.
+            # Reformatting the values of the probabilities to percentages.
             
             pred$.pred_0 <- percent(pred$.pred_0, suffix = "%")
             pred$.pred_1 <- percent(pred$.pred_1, suffix = "%")
@@ -278,7 +280,10 @@ server <- function(input, output, session) {
             
     # End of observe.  
         
-    }) 
+    })
+    
+  
+     
 
 # End of server.
     
